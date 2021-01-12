@@ -1,6 +1,8 @@
 package main
 
 import (
+	"encoding/json"
+
 	"github.com/valyala/fasthttp"
 )
 
@@ -10,6 +12,7 @@ type MyHandler struct {
 
 // HandleFastHTTP : Handler for HTTP
 func (h *MyHandler) HandleFastHTTP(ctx *fasthttp.RequestCtx) {
+	ctx.Response.Header.Set("content-type", "application/json")
 	switch string(ctx.Path()) {
 	case "/ping":
 		h.handlerPing(ctx)
@@ -19,8 +22,12 @@ func (h *MyHandler) HandleFastHTTP(ctx *fasthttp.RequestCtx) {
 }
 
 func (h *MyHandler) handlerPing(ctx *fasthttp.RequestCtx) {
-	ctx.Response.Header.Set("content-type", "application/json")
-	ctx.Response.SetBody([]byte("{\"message\":\"pong\"}"))
+	jsonOut, _ := json.Marshal(struct {
+		message string
+	}{
+		message: "pong",
+	})
+	ctx.Response.SetBody(jsonOut)
 }
 
 func main() {
